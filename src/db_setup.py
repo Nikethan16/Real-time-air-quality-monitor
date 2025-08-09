@@ -1,10 +1,9 @@
 import sqlite3
+import sys
 
-DB_FILE = 'db/aqi.db'
-
-def create_table():
-    """Creates the air_quality table in the SQLite database."""
-    conn = sqlite3.connect(DB_FILE)
+def create_table(db_file):
+    """Creates the air_quality table in the specified SQLite database."""
+    conn = sqlite3.connect(db_file)
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -22,7 +21,11 @@ def create_table():
     """)
     conn.commit()
     conn.close()
-    print("Database table 'air_quality' created successfully.")
+    print(f"Database table 'air_quality' created in {db_file} successfully.")
 
 if __name__ == "__main__":
-    create_table()
+    if len(sys.argv) < 2:
+        print("Usage: python db_setup.py <database_file>")
+    else:
+        db_file = sys.argv[1]
+        create_table(db_file)

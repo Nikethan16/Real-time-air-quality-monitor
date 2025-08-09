@@ -10,22 +10,23 @@ st.set_page_config(page_title="Real-time Air Quality Dashboard", layout="wide")
 st.title("Live Urban Air Quality Monitor")
 st.markdown("---")
 
+# --- Location Data ---
+CITY_LOCATIONS = {
+    'delhi': {'lat': 28.7041, 'lon': 77.1025},
+    'hyderabad': {'lat': 17.3850, 'lon': 78.4867}
+}
+
 # --- Sidebar for City Selection ---
 st.sidebar.header("Select a City")
-selected_city = st.sidebar.selectbox(
-    "Choose a City:",
-    ('delhi', 'hyderabad') # <-- These are the options for the user
-)
+selected_city = st.sidebar.selectbox("Choose a City:", list(CITY_LOCATIONS.keys()))
 
 # --- Function to Fetch Data from API ---
-@st.cache_data(ttl=5) # Cache data for 5 seconds to reduce API calls
+@st.cache_data(ttl=5)
 def get_latest_aqi_data(city):
-    """Fetches the latest AQI data from our FastAPI endpoint."""
     try:
         response = requests.get(f"http://localhost:8000/api/latest-aqi/{city}")
         response.raise_for_status()
-        data = response.json()
-        return pd.DataFrame(data)
+        return pd.DataFrame(response.json())
     except requests.exceptions.RequestException as e:
         st.error(f"Error fetching data from API: {e}")
         return pd.DataFrame()
@@ -38,11 +39,11 @@ def display_dashboard():
     if df.empty:
         st.warning("No data available from the API.")
         return
-        
+
     latest_record = df.iloc[0]
     anomaly_score = latest_record['anomaly_score']
 
-    # --- Display Key Metrics and Anomaly Status ---
+    # --- Display Metrics ---
     col1, col2, col3 = st.columns(3)
     with col1:
         st.metric(label="Current AQI", value=f"{latest_record['aqi']}")
