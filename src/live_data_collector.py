@@ -1,8 +1,10 @@
 import os
+import time
 import requests
 from supabase import create_client, Client
 from dotenv import load_dotenv
-from datetime import datetime, timezone,timedelta
+from datetime import datetime, timezone, timedelta
+
 # --------------------
 # CONFIG
 # --------------------
@@ -35,6 +37,22 @@ def to_ist(utc_dt):
     return utc_dt + ist_offset
 
 # --------------------
+# Retry-enabled Fetch Function
+# --------------------
+def fetch_with_retry(url, params, retries=3, delay=5, label="API"):
+    for attempt in range(1, retries + 1):
+        try:
+            r = requests.get(url, params=params, timeout=15)
+            r.raise_for_status()
+            return r.json()
+        except requests.exceptions.Timeout:
+            print(f"⏳ {label} timeout (attempt {attempt}/{retries})")
+        except requests.exceptions.RequestException as e:
+            print(f"⚠️ {label} fetch error: {e} (attempt {attempt}/{retries})")
+        time.sleep(delay)
+    return None
+
+# --------------------
 # Fetch Weather Data
 # --------------------
 def fetch_weather(lat, lon, start, end):
@@ -59,9 +77,7 @@ def fetch_weather(lat, lon, start, end):
         "end": end.isoformat(timespec="minutes"),
         "timezone": "UTC"
     }
-    r = requests.get(url, params=params)
-    r.raise_for_status()
-    return r.json()
+    return fetch_with_retry(url, params, label="Weather")
 
 # --------------------
 # Fetch Pollutant Data
@@ -85,14 +101,11 @@ def fetch_pollutants(lat, lon, start, end):
         "end": end.isoformat(timespec="minutes"),
         "timezone": "UTC"
     }
-    r = requests.get(url, params=params)
-    r.raise_for_status()
-    return r.json()
+    return fetch_with_retry(url, params, label="Pollutants")
 
 # --------------------
 # Merge Weather & Pollutants
 # --------------------
-
 def merge_data(city, weather, pollutants):
     now_utc_str = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
 
@@ -135,14 +148,12 @@ def merge_data(city, weather, pollutants):
             "nitrogen_dioxide": pollutants["hourly"]["nitrogen_dioxide"][idx_p],
             "sulphur_dioxide": pollutants["hourly"]["sulphur_dioxide"][idx_p],
             "ozone": pollutants["hourly"]["ozone"][idx_p],
-            "uv_index": weather["hourly"]["uv_index"][idx_p],
-            "uv_index_clear_sky": weather["hourly"]["uv_index_clear_sky"][idx_p],
+            "uv_index": weather["hourly"]["uv_index"][idx_w],
+            "uv_index_clear_sky": weather["hourly"]["uv_index_clear_sky"][idx_w],
             "methane": pollutants["hourly"]["methane"][idx_p],
         })
 
     return merged_records
-
-
 
 # --------------------
 # Insert into Supabase
@@ -168,6 +179,11 @@ for city, (lat, lon) in CITIES.items():
     print(f"\n📡 Fetching data for {city}...")
     weather = fetch_weather(lat, lon, start_utc, now_utc)
     pollutants = fetch_pollutants(lat, lon, start_utc, now_utc)
+
+    if not weather or not pollutants:
+        print(f"❌ Skipping {city} due to repeated fetch errors.")
+        continue
+
     merged = merge_data(city, weather, pollutants)
     inserted, checked = insert_if_new(merged)
     print(f"✅ {city}: {inserted} new records inserted ({checked} checked)")
