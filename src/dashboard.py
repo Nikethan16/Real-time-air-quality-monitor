@@ -1,77 +1,148 @@
-# src/dashboard.py
-
 import streamlit as st
 import pandas as pd
-import requests
+import numpy as np
 import time
 
-# --- Dashboard Title and Configuration ---
-st.set_page_config(page_title="Real-time Air Quality Dashboard", layout="wide")
-st.title("Live Urban Air Quality Monitor")
-st.markdown("---")
+# ------------------------
+# Page Config
+# ------------------------
+st.set_page_config(
+    page_title="📊 My Interactive Dashboard",
+    page_icon="📈",
+    layout="wide"
+)
 
-# --- Location Data ---
-CITY_LOCATIONS = {
-    'delhi': {'lat': 28.7041, 'lon': 77.1025},
-    'hyderabad': {'lat': 17.3850, 'lon': 78.4867}
-}
+# ------------------------
+# Custom CSS for styling & popup
+# ------------------------
+st.markdown("""
+    <style>
+        /* Main container adjustments */
+        .main {
+            background-color: #f7f9fc;
+            padding: 2rem;
+        }
+        /* Card-like look for each metric */
+        .metric-card {
+            background-color: white;
+            padding: 1.2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        /* Popup modal styling */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .popup-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from {opacity: 0; transform: scale(0.95);}
+            to {opacity: 1; transform: scale(1);}
+        }
+    </style>
+""", unsafe_allow_html=True)
 
-# --- Sidebar for City Selection ---
-st.sidebar.header("Select a City")
-selected_city = st.sidebar.selectbox("Choose a City:", list(CITY_LOCATIONS.keys()))
+# ------------------------
+# Popup Feature
+# ------------------------
+if "show_popup" not in st.session_state:
+    st.session_state.show_popup = False
 
-# --- Function to Fetch Data from API ---
-@st.cache_data(ttl=5)
-def get_latest_aqi_data(city):
-    try:
-        response = requests.get(f"http://localhost:8000/api/latest-aqi/{city}")
-        response.raise_for_status()
-        return pd.DataFrame(response.json())
-    except requests.exceptions.RequestException as e:
-        st.error(f"Error fetching data from API: {e}")
-        return pd.DataFrame()
+def toggle_popup():
+    st.session_state.show_popup = not st.session_state.show_popup
 
-# --- Main Dashboard Layout ---
-def display_dashboard():
-    st.header(f"Real-time Data for {selected_city.capitalize()}")
-    df = get_latest_aqi_data(selected_city)
+# ------------------------
+# Sidebar
+# ------------------------
+with st.sidebar:
+    st.title("⚙️ Controls")
+    date_range = st.date_input("Select Date Range", [])
+    if st.button("Show Info Popup"):
+        toggle_popup()
 
-    if df.empty:
-        st.warning("No data available from the API.")
-        return
+# ------------------------
+# Main Title
+# ------------------------
+st.title("📊 Interactive Dashboard with Popup")
+st.markdown("Welcome to your enhanced Streamlit dashboard!")
 
-    latest_record = df.iloc[0]
-    anomaly_score = latest_record['anomaly_score']
+# ------------------------
+# Fake Data
+# ------------------------
+np.random.seed(42)
+data = pd.DataFrame({
+    "Date": pd.date_range("2024-01-01", periods=30),
+    "Sales": np.random.randint(100, 1000, size=30),
+    "Revenue": np.random.randint(5000, 20000, size=30),
+    "Customers": np.random.randint(10, 200, size=30)
+})
 
-    # --- Display Metrics ---
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric(label="Current AQI", value=f"{latest_record['aqi']}")
-    with col2:
-        st.metric(label="Anomaly Score", value=f"{anomaly_score:.2f}")
-    with col3:
-        if anomaly_score < 0:
-            st.error("⚠️ **ANOMALY DETECTED** ⚠️")
-        else:
-            st.success("🟢 **Normal Reading** 🟢")
+# ------------------------
+# Metrics
+# ------------------------
+col1, col2, col3 = st.columns(3)
+with col1:
+    st.markdown('<div class="metric-card">', unsafe_allow_html=True)
+    st.metric("Total Sales", f"{data['Sales'].sum():,}")
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    # --- Display Charts ---
-    st.markdown("---")
-    st.subheader("Pollutant Levels")
-    pollutants_df = pd.DataFrame({
-        'Pollutant': ['O3', 'CO', 'SO2', 'PM2.5', 'PM10'],
-        'Value': [latest_record['o3'], latest_record['co'], latest_record['so2'], latest_record['pm25'], latest_record['pm10']]
-    })
-    st.bar_chart(pollutants_df.set_index('Pollutant'))
+with col2:
+    st.markdown('<div class="metric-card">', unsafe_allow_html=True)
+    st.metric("Total Revenue", f"${data['Revenue'].sum():,}")
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    # --- Raw Data Table ---
-    st.markdown("---")
-    st.subheader("Raw Data Table")
-    st.dataframe(df)
+with col3:
+    st.markdown('<div class="metric-card">', unsafe_allow_html=True)
+    st.metric("Total Customers", f"{data['Customers'].sum():,}")
+    st.markdown('</div>', unsafe_allow_html=True)
 
-# --- Real-time Rerunning Loop ---
-if __name__ == "__main__":
-    while True:
-        display_dashboard()
-        time.sleep(5)
-        st.rerun()
+# ------------------------
+# Chart
+# ------------------------
+st.subheader("📈 Sales Over Time")
+st.line_chart(data.set_index("Date")[["Sales", "Revenue"]])
+
+# ------------------------
+# Data Table
+# ------------------------
+st.subheader("📋 Detailed Data")
+st.dataframe(data)
+
+# ------------------------
+# Popup Display
+# ------------------------
+if st.session_state.show_popup:
+    st.markdown(
+        """
+        <div class="popup-overlay" onclick="window.location.reload()">
+            <div class="popup-content">
+                <h3>ℹ️ Dashboard Information</h3>
+                <p>This dashboard provides an interactive view of your business data. You can:</p>
+                <ul>
+                    <li>Track sales, revenue, and customers</li>
+                    <li>View performance trends over time</li>
+                    <li>Export and filter data</li>
+                </ul>
+                <p>Click anywhere outside to close this popup.</p>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
