@@ -14,6 +14,7 @@ SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
 TABLE_NAME = "air_quality_data"
 
+# Cities & coordinates
 CITIES = {
     "Delhi": (28.6139, 77.2090),
     "Mumbai": (19.0760, 72.8777),
@@ -22,9 +23,9 @@ CITIES = {
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-now_utc = datetime.now(timezone.utc)
-start_utc = now_utc - timedelta(hours=24)
-
+# Fetch only last 2 hours
+now_utc = datetime.now(timezone.utc).replace(microsecond=0)
+start_utc = now_utc - timedelta(hours=2)
 
 # --------------------
 # Retry-enabled Fetch Function
@@ -41,7 +42,6 @@ def fetch_with_retry(url, params, retries=3, delay=5, label="API"):
             print(f"⚠️ {label} fetch error: {e} (attempt {attempt}/{retries})")
         time.sleep(delay)
     return None
-
 
 # --------------------
 # API calls
@@ -70,7 +70,6 @@ def fetch_weather(lat, lon, start, end):
     }
     return fetch_with_retry(url, params, label="Weather")
 
-
 def fetch_pollutants(lat, lon, start, end):
     url = "https://air-quality-api.open-meteo.com/v1/air-quality"
     params = {
@@ -92,12 +91,11 @@ def fetch_pollutants(lat, lon, start, end):
     }
     return fetch_with_retry(url, params, label="Pollutants")
 
-
 # --------------------
 # Merge Weather & Pollutants
 # --------------------
 def merge_data(city, weather, pollutants):
-    now_utc_str = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    now_utc_str = now_utc.isoformat()
     timestamps_weather = weather["hourly"]["time"]
     timestamps_pollutants = pollutants["hourly"]["time"]
 
@@ -140,20 +138,21 @@ def merge_data(city, weather, pollutants):
         })
     return merged_records
 
-
 # --------------------
 # Insert into Supabase
 # --------------------
 def insert_if_new(records):
     new_recs = []
     for rec in records:
-        exists = supabase.table(TABLE_NAME).select("id").eq("city", rec["city"]).eq("datetime_utc", rec["datetime_utc"]).execute()
+        exists = supabase.table(TABLE_NAME).select("id")\
+            .eq("city", rec["city"])\
+            .eq("datetime_utc", rec["datetime_utc"])\
+            .execute()
         if len(exists.data) == 0:
             new_recs.append(rec)
     if new_recs:
         supabase.table(TABLE_NAME).insert(new_recs).execute()
     return len(new_recs), len(records)
-
 
 # --------------------
 # MAIN SCRIPT
@@ -170,11 +169,10 @@ for city, (lat, lon) in CITIES.items():
             merged = merge_data(city, weather, pollutants)
             inserted, checked = insert_if_new(merged)
             print(f"✅ {city}: {inserted} new records inserted ({checked} checked)")
-            break  # Success, move to next city
+            break
         else:
             print(f"⚠️ {city} fetch failed, retrying...")
             time.sleep(5)
-
     else:
         print(f"❌ Skipping {city} after 3 failed attempts.")
 

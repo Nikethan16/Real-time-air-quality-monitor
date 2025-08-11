@@ -2,35 +2,34 @@ name: Live Data Collector
 
 on:
   schedule:
-    - cron: "0 * * * *" # Every hour at 00 minutes
-  workflow_dispatch: # Allow manual run from GitHub Actions tab
+    # Runs every 2 hours
+    - cron: "0 */2 * * *"
+  workflow_dispatch: # Allow manual runs
 
 jobs:
-  collect-data:
+  run-script:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       max-parallel: 1
       matrix:
-        attempt: [1, 2, 3]  # Retry job up to 3 times
-
+        retry: [1, 2, 3]  # 3 attempts total (initial + 2 retries)
     steps:
-      - name: Checkout repository
+      - name: Check out repository
         uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: "3.10"
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run data collector
+      - name: Run Live Data Collector (Attempt ${{ matrix.retry }})
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-        run: |
-          python src/live_data_collector.py
+        run: python src/live_data_collector.py
