@@ -14,27 +14,17 @@ SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
 TABLE_NAME = "air_quality_data"
 
-# City coordinates
 CITIES = {
     "Delhi": (28.6139, 77.2090),
     "Mumbai": (19.0760, 72.8777),
     "Hyderabad": (17.3850, 78.4867),
 }
 
-# --------------------
-# SUPABASE CLIENT
-# --------------------
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-# --------------------
-# TIME RANGE (Past 24h)
-# --------------------
 now_utc = datetime.now(timezone.utc)
 start_utc = now_utc - timedelta(hours=24)
 
-def to_ist(utc_dt):
-    ist_offset = timedelta(hours=5, minutes=30)
-    return utc_dt + ist_offset
 
 # --------------------
 # Retry-enabled Fetch Function
@@ -52,8 +42,9 @@ def fetch_with_retry(url, params, retries=3, delay=5, label="API"):
         time.sleep(delay)
     return None
 
+
 # --------------------
-# Fetch Weather Data
+# API calls
 # --------------------
 def fetch_weather(lat, lon, start, end):
     url = "https://api.open-meteo.com/v1/forecast"
@@ -79,9 +70,7 @@ def fetch_weather(lat, lon, start, end):
     }
     return fetch_with_retry(url, params, label="Weather")
 
-# --------------------
-# Fetch Pollutant Data
-# --------------------
+
 def fetch_pollutants(lat, lon, start, end):
     url = "https://air-quality-api.open-meteo.com/v1/air-quality"
     params = {
@@ -103,16 +92,15 @@ def fetch_pollutants(lat, lon, start, end):
     }
     return fetch_with_retry(url, params, label="Pollutants")
 
+
 # --------------------
 # Merge Weather & Pollutants
 # --------------------
 def merge_data(city, weather, pollutants):
     now_utc_str = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
-
     timestamps_weather = weather["hourly"]["time"]
     timestamps_pollutants = pollutants["hourly"]["time"]
 
-    # Get timestamps common to both and up to now
     valid_times = sorted(
         t for t in set(timestamps_weather) & set(timestamps_pollutants)
         if t <= now_utc_str
@@ -122,13 +110,11 @@ def merge_data(city, weather, pollutants):
     for t in valid_times:
         idx_w = timestamps_weather.index(t)
         idx_p = timestamps_pollutants.index(t)
-
         merged_records.append({
             "city": city,
             "datetime_utc": t,
             "datetime_ist": (
                 datetime.fromisoformat(t.replace("Z", "+00:00"))
-                .astimezone(timezone.utc)
                 .astimezone(timezone(timedelta(hours=5, minutes=30)))
                 .isoformat()
             ),
@@ -152,8 +138,8 @@ def merge_data(city, weather, pollutants):
             "uv_index_clear_sky": weather["hourly"]["uv_index_clear_sky"][idx_w],
             "methane": pollutants["hourly"]["methane"][idx_p],
         })
-
     return merged_records
+
 
 # --------------------
 # Insert into Supabase
@@ -161,14 +147,13 @@ def merge_data(city, weather, pollutants):
 def insert_if_new(records):
     new_recs = []
     for rec in records:
-        # Check duplicates
         exists = supabase.table(TABLE_NAME).select("id").eq("city", rec["city"]).eq("datetime_utc", rec["datetime_utc"]).execute()
         if len(exists.data) == 0:
             new_recs.append(rec)
-    
     if new_recs:
         supabase.table(TABLE_NAME).insert(new_recs).execute()
     return len(new_recs), len(records)
+
 
 # --------------------
 # MAIN SCRIPT
@@ -176,16 +161,21 @@ def insert_if_new(records):
 print(f"🚀 Starting live data update ({start_utc.isoformat()} → {now_utc.isoformat()})")
 
 for city, (lat, lon) in CITIES.items():
-    print(f"\n📡 Fetching data for {city}...")
-    weather = fetch_weather(lat, lon, start_utc, now_utc)
-    pollutants = fetch_pollutants(lat, lon, start_utc, now_utc)
+    for attempt in range(1, 4):  # Up to 3 retries per city
+        print(f"\n📡 Fetching data for {city} (attempt {attempt}/3)...")
+        weather = fetch_weather(lat, lon, start_utc, now_utc)
+        pollutants = fetch_pollutants(lat, lon, start_utc, now_utc)
 
-    if not weather or not pollutants:
-        print(f"❌ Skipping {city} due to repeated fetch errors.")
-        continue
+        if weather and pollutants:
+            merged = merge_data(city, weather, pollutants)
+            inserted, checked = insert_if_new(merged)
+            print(f"✅ {city}: {inserted} new records inserted ({checked} checked)")
+            break  # Success, move to next city
+        else:
+            print(f"⚠️ {city} fetch failed, retrying...")
+            time.sleep(5)
 
-    merged = merge_data(city, weather, pollutants)
-    inserted, checked = insert_if_new(merged)
-    print(f"✅ {city}: {inserted} new records inserted ({checked} checked)")
+    else:
+        print(f"❌ Skipping {city} after 3 failed attempts.")
 
 print("\n🎉 Live data collection completed!")
