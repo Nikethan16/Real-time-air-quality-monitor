@@ -14,14 +14,19 @@ jobs:
       max-parallel: 1
       matrix:
         retry: [1, 2, 3]  # 3 attempts total (initial + 2 retries)
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
 
-      - name: Set up Python
+      - name: Remove cached Python (force fresh install)
+        run: rm -rf /opt/hostedtoolcache/Python
+
+      - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
+          cache: "pip"
 
       - name: Verify Python version
         run: python --version
