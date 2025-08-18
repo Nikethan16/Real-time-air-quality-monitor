@@ -8,23 +8,33 @@ on:
 jobs:
   run-pipeline:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        retry: [1, 2, 3]  # 3 attempts total (initial + 2 retries)
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Set up Python
+      - name: Remove cached Python (force fresh install)
+        run: rm -rf "${{ runner.tool_cache }}/Python"
+
+      - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
+          cache: "pip"
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run AQI pipeline
+      - name: Run AQI pipeline (Attempt ${{ matrix.retry }})
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: |
-          python src/aqi_pipeline.py
+          python src/api_pipeline.py
