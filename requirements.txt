@@ -9,3 +9,4 @@ scikit_learn==1.7.1
 streamlit==1.48.0
 supabase==2.18.0
 uvicorn==0.35.0
+catboost==1.2.0
