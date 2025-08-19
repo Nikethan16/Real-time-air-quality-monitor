@@ -13,5 +13,4 @@ catboost==1.2.5
 plotly==5.10.0
 streamlit-autorefresh==1.0.1
 humanize==4.12.3
-xlsxwriter==3.0.10
 openpyxl==3.1.5
