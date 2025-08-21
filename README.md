@@ -94,8 +94,7 @@ Create a .env file with Supabase credentials:
 SUPABASE_URL=your_supabase_url
 SUPABASE_SERVICE_KEY=your_supabase_service_key
 ```
-
-### Install Python dependencies:
+Install Python dependencies:
 ```bash
 pip install -r requirements.txt
 ```
@@ -106,21 +105,19 @@ streamlit run src/dashboard.py
 ```
 
 ### 4. (Optional) Run FastAPI
-```bash uvicorn src.api:app --reload --port 8000 ```
+```bash 
+uvicorn src.api:app --reload --port 8000 
+```
+Visit → [FastApi](http://localhost:8000/docs) to explore the API.
 
-
-Visit http://localhost:8000/docs to explore the API.
-
-5. (Optional) Docker
+### 5. (Optional) Docker
+```bash
 docker build -t air-quality-app .
 docker run -p 8501:8501 -p 8000:8000 --env-file .env air-quality-app
+```
+Streamlit Dashboard → [Streamlit](http://localhost:8501)
 
-
-Access:
-
-Streamlit Dashboard → http://localhost:8501
-
-FastAPI Docs → http://localhost:8000/docs
+FastAPI Docs → [FastApi](http://localhost:8000/docs)
 
 Usage Examples
 
