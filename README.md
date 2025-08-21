@@ -1,4 +1,4 @@
-#  Real-Time Air Quality Monitor & Forecast Dashboard  🌫️
+#  Real-Time Air Quality Monitor & Forecast Dashboard 
 
 [Live Demo](https://real-time-air-quality-monitor.streamlit.app/) •  
 [GitHub Repo](https://github.com/Nikethan16/Real-time-air-quality-monitor)
@@ -61,15 +61,21 @@ This project delivers a real-time air quality monitoring system with the followi
                                 ↓                  ↓
                      Streamlit Dashboard     FastAPI REST API (Dockerized)
 
-Tech Stack
-Component	Technology
-Data Collection	Open-Meteo API, GitHub Actions
-Storage	Supabase (PostgreSQL)
-Processing	Python, CatBoost, Scikit-Learn
-Dashboard	Streamlit, Plotly
-API Backend	FastAPI, Uvicorn
-Deployment	Docker, GitHub Actions, Streamlit Cloud
-Utilities	Pandas, numpy, python-dotenv, humanize
+```
+---
+
+
+## 🛠 Tech Stack
+| **Component**       | **Technology**                          |
+| ------------------- | --------------------------------------- |
+| **Data Collection** | Open-Meteo API, GitHub Actions          |
+| **Storage**         | Supabase (PostgreSQL)                   |
+| **Processing**      | Python, CatBoost, Scikit-learn          |
+| **Dashboard**       | Streamlit, Plotly                       |
+| **API Backend**     | FastAPI, Uvicorn                        |
+| **Deployment**      | Docker, GitHub Actions, Streamlit Cloud |
+| **Utilities**       | Pandas, Numpy, python-dotenv, Humanize  |
+
 
 Demo
 
