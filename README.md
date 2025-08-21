@@ -18,7 +18,6 @@ This project delivers a real-time air quality monitoring system with the followi
 - **Future-Ready API & Containerization**: Includes a Dockerized FastAPI backend for exposing AQI data to external applications or microservices.
 - **Robust CI/CD**: GitHub Actions automates data ingestion, ML inference, and dashboard deployment.
 
-> “Many popular projects’ README use lists, visual aids, and contribution guidelines — these improve comprehension and adoption.” :contentReference[oaicite:0]{index=0}
 
 ---
 
@@ -145,10 +144,11 @@ Contributions are welcome 🎉
 
 * Open issues / feature requests
 * Submit PRs for improvements (models, UI, API, docs)
+---
 
 ## 🧑‍💻 Author & License
 
-👤 Srinikethan Chandru
+👤 Srinikethan Chundru
 
 * [LinkedIn](https://www.linkedin.com/in/srinikethan-chundru/) ↗️
 * [GitHub](https://github.com/Nikethan16) ↗️
