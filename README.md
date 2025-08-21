@@ -1,119 +1,62 @@
-🌫️ Real-Time Air Quality Monitoring & Forecasting Dashboard
+#  Real-Time Air Quality Monitor & Forecast Dashboard  🌫️
 
-📌 Project Overview
+[Live Demo](https://real-time-air-quality-monitor.streamlit.app/) •  
+[GitHub Repo](https://github.com/Nikethan16/Real-time-air-quality-monitor)
 
-Air pollution is a major concern in modern cities, directly impacting public health and quality of life. This project provides a real-time air quality monitoring system that:
+---
 
-Collects raw environmental data (via Open-Meteo API
-).
+##  Overview
 
-Computes Air Quality Index (AQI) for multiple cities.
+This project delivers a real-time air quality monitoring system with the following capabilities:
 
-Uses a pre-trained CatBoost model to forecast AQI for +1h, +2h, and +3h horizons.
+- ** Automated ETL Pipeline**: GitHub Actions fetches live environmental data from Open-Meteo and stores it in Supabase.
+- ** Data Processing & Forecasting**: Calculates AQI, classifies categories, forecasts +1h/+2h/+3h using CatBoost, detects anomalies, and stores results in Supabase.
+- ** Dashboard Visualization**: Interactive Streamlit app with real-time KPIs, trends, pollutant breakdowns, maps, and export options.
+- ** Future-Ready API & Containerization**: Includes a Dockerized FastAPI backend for exposing AQI data to external applications or microservices.
+- ** Robust CI/CD**: GitHub Actions automates data ingestion, ML inference, and dashboard deployment.
 
-Detects anomalies in pollution spikes.
+> “Many popular projects’ README use lists, visual aids, and contribution guidelines — these improve comprehension and adoption.” :contentReference[oaicite:0]{index=0}
 
-Visualizes results in an interactive Streamlit dashboard with charts, trends, and maps.
+---
 
-🎯 Key Features
+##  Table of Contents
 
-✅ Automated Data Pipeline
+- [Features](#-features)  
+- [Architecture](#-architecture)  
+- [Tech Stack](#-tech-stack)  
+- [Demo](#-demo)  
+- [Getting Started](#-getting-started)  
+  - [1. Clone & Setup](#1-clone--setup)  
+  - [2. Environment](#2-environment)  
+  - [3. Run Dashboard](#3-run-dashboard)  
+  - [4. (Optional) Run FastAPI](#4-optional-run-fastapi)  
+  - [5. (Optional) Docker](#5-optional-docker)  
+- [Usage Examples](#-usage-examples)  
+- [Potential Use Cases](#-real-world-use-cases)  
+- [Contribute](#-contribute)  
+- [Author & License](#-author--license)
 
-GitHub Actions workflows collect data every 2 hours and store it in Supabase.
+---
 
-AQI values and forecasts are computed and updated automatically.
+##  Features
 
-✅ Machine Learning Forecasting
+- ⏱ **Live Data Ingestion**: Automatically collects data from Open-Meteo every 2 hours via GitHub Actions.
+-  **AQI & Forecasting**: Uses CatBoost to compute AQI and short-term forecasts.
+-  **Anomaly Detection**: Flags sudden spikes in air pollution for alerting.
+-  **Rich Dashboard**:  
+  - Real-time AQI metrics  
+  - City-level comparisons and maps  
+  - Pollutant trends and exportable data  
+-  **API Server (FastAPI)**: Provides endpoints for `AQI`, pollutant breakdowns, and health checks.
+-  **Dockerized Deployment**: Easily run the dashboard + API together anywhere using Docker.
 
-Uses a CatBoost regression model trained on historical pollutant and weather data.
+---
 
-Provides short-term AQI forecasts (+1h, +2h, +3h).
+##  Architecture
 
-✅ Anomaly Detection
-
-Identifies unusual spikes in AQI, highlighting potential pollution events.
-
-✅ Interactive Dashboard (built with Streamlit + Plotly)
-
-Live AQI trends per city.
-
-Historical trends with anomaly highlights.
-
-Pollutant-level breakdown (PM2.5, PM10, etc.).
-
-City comparison on a geographic map.
-
-Export options for CSV/Excel.
-
-🛠️ Tech Stack
-
-Data Collection: Open-Meteo API, GitHub Actions
-
-Data Storage: Supabase (PostgreSQL)
-
-Machine Learning: CatBoost, Scikit-learn
-
-Dashboard: Streamlit, Plotly
-
-Automation: GitHub Actions CI/CD
-
-Environment: Python 3.10+
-
-
-🚀 Deployment
-
-This dashboard is deployed on Streamlit Cloud.
-You can view the live version here:
-
-https://real-time-air-quality-monitor.streamlit.app/
-
-⚙️ Local Setup
-
-Clone repo
-
-git clone https://github.com/Nikethan16/Real-time-air-quality-monitor
-
-cd real-time-air-quality-monitor
-
-
-Install dependencies
-
-pip install -r requirements.txt
-
-
-Set environment variables
-Create .env file:
-
-SUPABASE_URL=your_supabase_url
-SUPABASE_SERVICE_KEY=your_supabase_service_key
-
-
-Run Streamlit dashboard
-
-streamlit run src/dashboard.py
-
-📊 Real-World Usefulness
-
-Public Health Awareness → Citizens can check current AQI and avoid outdoor activity during high pollution.
-
-Government & NGOs → Early alerts for pollution spikes and anomaly detection.
-
-Smart Cities → Integration into IoT systems for adaptive traffic control or industrial monitoring.
-
-Students/Researchers → Hands-on example of end-to-end ML pipeline with real-world impact.
-
-👨‍💻 Author
-
-Developed by Nikethan
-
-🌐 LinkedIn - https://www.linkedin.com/in/srinikethan-chundru/
-
- | GitHub - https://github.com/Nikethan16
-
-🚀 Always exploring data-driven solutions for real-world problems.
-
-📜 License
-
-This project is licensed under the MIT License – free to use and adapt.
-
-⚡ In short: This project shows how machine learning + real-time data pipelines + dashboards can be combined to make pollution monitoring accessible, actionable, and scalable.
+```text
+[ Open-Meteo API ] → GitHub Actions ETL → [ Supabase DB ]
+                                ↓
+                            Processing → [ aqi_results table ]
+                                ↓                  ↓
+                     Streamlit Dashboard     FastAPI REST API (Dockerized)
