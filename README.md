@@ -77,13 +77,13 @@ This project delivers a real-time air quality monitoring system with the followi
 | **Utilities**       | Pandas, Numpy, python-dotenv, Humanize  |
 
 
-Demo
+---
+## 🎥 Demo
 
-➡ Live Streamlit Dashboard:
-https://real-time-air-quality-monitor.streamlit.app/
+- 🌍 **Live Dashboard** → [Streamlit App](https://real-time-air-quality-monitor.streamlit.app/)
+- 📘 **FastAPI Docs** (local/Docker) → [http://localhost:8000/docs](http://localhost:8000/docs)
 
-➡ FastAPI Docs (local or Docker):
-http://localhost:8000/docs
+---
 
 Getting Started
 1. Clone & Setup
