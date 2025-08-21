@@ -1,7 +1,10 @@
 #  Real-Time Air Quality Monitor & Forecast Dashboard 
 
-[Live Demo](https://real-time-air-quality-monitor.streamlit.app/) •  
-[GitHub Repo](https://github.com/Nikethan16/Real-time-air-quality-monitor)
+## 🎥 Demo
+
+- 🌍 **Live Dashboard** → [Streamlit App](https://real-time-air-quality-monitor.streamlit.app/)
+  
+- 🔗 **Github** → [GitHub Repo](https://github.com/Nikethan16/Real-time-air-quality-monitor)
 
 ---
 
@@ -76,20 +79,14 @@ This project delivers a real-time air quality monitoring system with the followi
 | **Deployment**      | Docker, GitHub Actions, Streamlit Cloud |
 | **Utilities**       | Pandas, Numpy, python-dotenv, Humanize  |
 
-
----
-## 🎥 Demo
-
-- 🌍 **Live Dashboard** → [Streamlit App](https://real-time-air-quality-monitor.streamlit.app/)
-- 📘 **FastAPI Docs** (local/Docker) → [http://localhost:8000/docs](http://localhost:8000/docs)
-
 ---
 
-Getting Started
-1. Clone & Setup
+## ⚡Getting Started
+### 1. Clone & Setup
+```bash
 git clone https://github.com/Nikethan16/Real-time-air-quality-monitor.git
 cd Real-time-air-quality-monitor
-
+```
 2. Environment
 
 Create a .env file with Supabase credentials:
