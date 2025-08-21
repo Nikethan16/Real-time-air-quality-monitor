@@ -87,23 +87,26 @@ This project delivers a real-time air quality monitoring system with the followi
 git clone https://github.com/Nikethan16/Real-time-air-quality-monitor.git
 cd Real-time-air-quality-monitor
 ```
-2. Environment
+### 2. Environment
 
 Create a .env file with Supabase credentials:
-
+```bash
 SUPABASE_URL=your_supabase_url
 SUPABASE_SERVICE_KEY=your_supabase_service_key
+```
 
-
-Install Python dependencies:
-
+### Install Python dependencies:
+```bash
 pip install -r requirements.txt
+```
 
-3. Run Dashboard
+### 3. Run Dashboard
+```bash
 streamlit run src/dashboard.py
+```
 
-4. (Optional) Run FastAPI
-uvicorn src.api:app --reload --port 8000
+### 4. (Optional) Run FastAPI
+```bash uvicorn src.api:app --reload --port 8000 ```
 
 
 Visit http://localhost:8000/docs to explore the API.
