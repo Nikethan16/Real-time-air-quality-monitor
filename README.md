@@ -9,11 +9,11 @@
 
 This project delivers a real-time air quality monitoring system with the following capabilities:
 
-- ** Automated ETL Pipeline**: GitHub Actions fetches live environmental data from Open-Meteo and stores it in Supabase.
-- ** Data Processing & Forecasting**: Calculates AQI, classifies categories, forecasts +1h/+2h/+3h using CatBoost, detects anomalies, and stores results in Supabase.
-- ** Dashboard Visualization**: Interactive Streamlit app with real-time KPIs, trends, pollutant breakdowns, maps, and export options.
-- ** Future-Ready API & Containerization**: Includes a Dockerized FastAPI backend for exposing AQI data to external applications or microservices.
-- ** Robust CI/CD**: GitHub Actions automates data ingestion, ML inference, and dashboard deployment.
+- **Automated ETL Pipeline**: GitHub Actions fetches live environmental data from Open-Meteo and stores it in Supabase.
+- **Data Processing & Forecasting**: Calculates AQI, classifies categories, forecasts +1h/+2h/+3h using CatBoost, detects anomalies, and stores results in Supabase.
+- **Dashboard Visualization**: Interactive Streamlit app with real-time KPIs, trends, pollutant breakdowns, maps, and export options.
+- **Future-Ready API & Containerization**: Includes a Dockerized FastAPI backend for exposing AQI data to external applications or microservices.
+- **Robust CI/CD**: GitHub Actions automates data ingestion, ML inference, and dashboard deployment.
 
 > “Many popular projects’ README use lists, visual aids, and contribution guidelines — these improve comprehension and adoption.” :contentReference[oaicite:0]{index=0}
 
@@ -60,3 +60,90 @@ This project delivers a real-time air quality monitoring system with the followi
                             Processing → [ aqi_results table ]
                                 ↓                  ↓
                      Streamlit Dashboard     FastAPI REST API (Dockerized)
+
+Tech Stack
+Component	Technology
+Data Collection	Open-Meteo API, GitHub Actions
+Storage	Supabase (PostgreSQL)
+Processing	Python, CatBoost, Scikit-Learn
+Dashboard	Streamlit, Plotly
+API Backend	FastAPI, Uvicorn
+Deployment	Docker, GitHub Actions, Streamlit Cloud
+Utilities	Pandas, numpy, python-dotenv, humanize
+
+Demo
+
+➡ Live Streamlit Dashboard:
+https://real-time-air-quality-monitor.streamlit.app/
+
+➡ FastAPI Docs (local or Docker):
+http://localhost:8000/docs
+
+Getting Started
+1. Clone & Setup
+git clone https://github.com/Nikethan16/Real-time-air-quality-monitor.git
+cd Real-time-air-quality-monitor
+
+2. Environment
+
+Create a .env file with Supabase credentials:
+
+SUPABASE_URL=your_supabase_url
+SUPABASE_SERVICE_KEY=your_supabase_service_key
+
+
+Install Python dependencies:
+
+pip install -r requirements.txt
+
+3. Run Dashboard
+streamlit run src/dashboard.py
+
+4. (Optional) Run FastAPI
+uvicorn src.api:app --reload --port 8000
+
+
+Visit http://localhost:8000/docs to explore the API.
+
+5. (Optional) Docker
+docker build -t air-quality-app .
+docker run -p 8501:8501 -p 8000:8000 --env-file .env air-quality-app
+
+
+Access:
+
+Streamlit Dashboard → http://localhost:8501
+
+FastAPI Docs → http://localhost:8000/docs
+
+Usage Examples
+
+View live AQI trends and anomalies for cities like Delhi and Mumbai.
+
+Export CSV/Excel data for further analysis.
+
+Integrate FastAPI into a mobile app or other client to fetch real-time AQI.
+
+Real-World Usefulness
+
+Public Health: Citizens and policymakers can monitor air quality and respond quickly.
+
+Smart City Applications: Integrate alerts and analytics into urban planning or IoT systems.
+
+Academic Research: Provides transparent dataset + ML-based forecasts for study.
+
+CHROME Dashboard: Embed interactive maps and KPIs in smart displays or web portals.
+
+Contribute
+
+Feel free to open issues or PRs! Whether it’s improving model accuracy, extending functionality, or polishing UI, all contributions are welcome.
+
+Author & License
+
+Srinikethan Chundru
+
+LinkedIn: https://www.linkedin.com/in/srinikethan-chundru/
+
+GitHub: https://github.com/Nikethan16
+
+Licensed under the MIT License – feel free to use and adapt.
