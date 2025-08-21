@@ -115,41 +115,42 @@ Visit → [FastApi](http://localhost:8000/docs) to explore the API.
 docker build -t air-quality-app .
 docker run -p 8501:8501 -p 8000:8000 --env-file .env air-quality-app
 ```
-Streamlit Dashboard → [Streamlit](http://localhost:8501)
+Streamlit Dashboard → [Streamlit](http://localhost:8501/)
 
-FastAPI Docs → [FastApi](http://localhost:8000/docs)
+FastAPI Docs → [FastApi](http://localhost:8000/docs/)
+
+---
+
+## 📊 Usage Examples
+
+* View live **AQI trends** & anomalies for cities like Delhi & Mumbai.
+* Export **CSV/Excel data** for research or reporting.
+* Integrate **FastAPI** into a mobile app or IoT device for real-time AQI.
+
+---
+
+## 🌍 Real-World Use Cases
+
+* 🏥 Public Health → Citizens & policymakers can track air quality & respond quickly.
+* 🏙️ Smart Cities → Integrate alerts into IoT systems & urban dashboards.
+* 🎓 Research → Open dataset + ML forecasts for environmental studies.
+* 📺 Smart Displays → Embed interactive maps & AQI KPIs in smart city portals.
+
 ---
 
 
+## 🤝Contribute
 
-Usage Examples
+Contributions are welcome 🎉
 
-View live AQI trends and anomalies for cities like Delhi and Mumbai.
+* Open issues / feature requests
+* Submit PRs for improvements (models, UI, API, docs)
 
-Export CSV/Excel data for further analysis.
+## 🧑‍💻 Author & License
 
-Integrate FastAPI into a mobile app or other client to fetch real-time AQI.
+👤 Srinikethan Chandru
 
-Real-World Usefulness
+* [LinkedIn](https://www.linkedin.com/in/srinikethan-chundru/) ↗️
+* [GitHub](https://github.com/Nikethan16) ↗️
 
-Public Health: Citizens and policymakers can monitor air quality and respond quickly.
-
-Smart City Applications: Integrate alerts and analytics into urban planning or IoT systems.
-
-Academic Research: Provides transparent dataset + ML-based forecasts for study.
-
-CHROME Dashboard: Embed interactive maps and KPIs in smart displays or web portals.
-
-Contribute
-
-Feel free to open issues or PRs! Whether it’s improving model accuracy, extending functionality, or polishing UI, all contributions are welcome.
-
-Author & License
-
-Srinikethan Chundru
-
-LinkedIn: https://www.linkedin.com/in/srinikethan-chundru/
-
-GitHub: https://github.com/Nikethan16
-
-Licensed under the MIT License – feel free to use and adapt.
+📜 Licensed under the MIT License – free to use & adapt.
